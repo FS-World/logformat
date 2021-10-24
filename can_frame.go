@@ -14,7 +14,7 @@ var (
 )
 
 const (
-	FrameLength = 16 // FrameLength is total length of the frame in the kernel.
+	CANFrameLength = 16 // CANFrameLength is total length of the frame in the kernel.
 )
 
 // Timespec is the unix.Timespec struct with msgp tags
