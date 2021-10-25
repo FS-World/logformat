@@ -1,6 +1,7 @@
 package logformat
 
 import (
+	"bytes"
 	"math/rand"
 	"os"
 	"reflect"
@@ -42,7 +43,7 @@ func TestCANLogWriterReader(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	err = w.Close()
+	expHash, err := w.Close()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -51,12 +52,15 @@ func TestCANLogWriterReader(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	frames, err := r.ReadAll()
+	frames, gotHash, err := r.ReadAll()
 	if err != nil {
 		t.Fatal(err)
 	}
 	if len(frames) != testSize {
 		t.Fatal("error reading messages")
+	}
+	if !bytes.Equal(expHash, gotHash) {
+		t.Fatalf("error: hashes don't match\nEXP %v != %v", expHash, gotHash)
 	}
 	for i := 0; i < testSize; i++ {
 		if !reflect.DeepEqual(frames[i], expected[i]) {
@@ -97,7 +101,7 @@ func TestIVTLogWriterReader(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	err = w.Close()
+	expHash, err := w.Close()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -106,12 +110,15 @@ func TestIVTLogWriterReader(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	frames, err := r.ReadAll()
+	frames, gotHash, err := r.ReadAll()
 	if err != nil {
 		t.Fatal(err)
 	}
 	if len(frames) != testSize {
 		t.Fatal("error reading messages")
+	}
+	if !bytes.Equal(expHash, gotHash) {
+		t.Fatalf("error: hashes don't match\nEXP %v != %v", expHash, gotHash)
 	}
 	for i := 0; i < testSize; i++ {
 		if !reflect.DeepEqual(frames[i], expected[i]) {
