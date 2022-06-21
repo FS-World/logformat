@@ -17,7 +17,167 @@ var (
 	_ easyjson.Marshaler
 )
 
-func easyjson3af0d39DecodeGithubComFsWorldLogformat(in *jlexer.Lexer, out *IVTMessage) {
+func easyjson3af0d39DecodeGithubComFsWorldLogformat(in *jlexer.Lexer, out *IvtBufferedMeasurement) {
+	isTopLevel := in.IsStart()
+	if in.IsNull() {
+		if isTopLevel {
+			in.Consumed()
+		}
+		in.Skip()
+		return
+	}
+	in.Delim('{')
+	for !in.IsDelim('}') {
+		key := in.UnsafeFieldName(false)
+		in.WantColon()
+		if in.IsNull() {
+			in.Skip()
+			in.WantComma()
+			continue
+		}
+		switch key {
+		case "u":
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				in.Delim('[')
+				v1 := 0
+				for !in.IsDelim(']') {
+					if v1 < 50 {
+						(out.Voltages)[v1] = int32(in.Int32())
+						v1++
+					} else {
+						in.SkipRecursive()
+					}
+					in.WantComma()
+				}
+				in.Delim(']')
+			}
+		case "i":
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				in.Delim('[')
+				v2 := 0
+				for !in.IsDelim(']') {
+					if v2 < 50 {
+						(out.Currents)[v2] = int32(in.Int32())
+						v2++
+					} else {
+						in.SkipRecursive()
+					}
+					in.WantComma()
+				}
+				in.Delim(']')
+			}
+		case "t":
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				in.Delim('[')
+				v3 := 0
+				for !in.IsDelim(']') {
+					if v3 < 8 {
+						(out.Temperatures)[v3] = int32(in.Int32())
+						v3++
+					} else {
+						in.SkipRecursive()
+					}
+					in.WantComma()
+				}
+				in.Delim(']')
+			}
+		case "s":
+			(out.SegmentStart).UnmarshalEasyJSON(in)
+		case "e":
+			(out.SegmentEnd).UnmarshalEasyJSON(in)
+		default:
+			in.SkipRecursive()
+		}
+		in.WantComma()
+	}
+	in.Delim('}')
+	if isTopLevel {
+		in.Consumed()
+	}
+}
+func easyjson3af0d39EncodeGithubComFsWorldLogformat(out *jwriter.Writer, in IvtBufferedMeasurement) {
+	out.RawByte('{')
+	first := true
+	_ = first
+	{
+		const prefix string = ",\"u\":"
+		out.RawString(prefix[1:])
+		out.RawByte('[')
+		for v4 := range in.Voltages {
+			if v4 > 0 {
+				out.RawByte(',')
+			}
+			out.Int32(int32((in.Voltages)[v4]))
+		}
+		out.RawByte(']')
+	}
+	{
+		const prefix string = ",\"i\":"
+		out.RawString(prefix)
+		out.RawByte('[')
+		for v5 := range in.Currents {
+			if v5 > 0 {
+				out.RawByte(',')
+			}
+			out.Int32(int32((in.Currents)[v5]))
+		}
+		out.RawByte(']')
+	}
+	{
+		const prefix string = ",\"t\":"
+		out.RawString(prefix)
+		out.RawByte('[')
+		for v6 := range in.Temperatures {
+			if v6 > 0 {
+				out.RawByte(',')
+			}
+			out.Int32(int32((in.Temperatures)[v6]))
+		}
+		out.RawByte(']')
+	}
+	{
+		const prefix string = ",\"s\":"
+		out.RawString(prefix)
+		(in.SegmentStart).MarshalEasyJSON(out)
+	}
+	{
+		const prefix string = ",\"e\":"
+		out.RawString(prefix)
+		(in.SegmentEnd).MarshalEasyJSON(out)
+	}
+	out.RawByte('}')
+}
+
+// MarshalJSON supports json.Marshaler interface
+func (v IvtBufferedMeasurement) MarshalJSON() ([]byte, error) {
+	w := jwriter.Writer{}
+	easyjson3af0d39EncodeGithubComFsWorldLogformat(&w, v)
+	return w.Buffer.BuildBytes(), w.Error
+}
+
+// MarshalEasyJSON supports easyjson.Marshaler interface
+func (v IvtBufferedMeasurement) MarshalEasyJSON(w *jwriter.Writer) {
+	easyjson3af0d39EncodeGithubComFsWorldLogformat(w, v)
+}
+
+// UnmarshalJSON supports json.Unmarshaler interface
+func (v *IvtBufferedMeasurement) UnmarshalJSON(data []byte) error {
+	r := jlexer.Lexer{Data: data}
+	easyjson3af0d39DecodeGithubComFsWorldLogformat(&r, v)
+	return r.Error()
+}
+
+// UnmarshalEasyJSON supports easyjson.Unmarshaler interface
+func (v *IvtBufferedMeasurement) UnmarshalEasyJSON(l *jlexer.Lexer) {
+	easyjson3af0d39DecodeGithubComFsWorldLogformat(l, v)
+}
+func easyjson3af0d39DecodeGithubComFsWorldLogformat1(in *jlexer.Lexer, out *IVTMessage) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -54,7 +214,7 @@ func easyjson3af0d39DecodeGithubComFsWorldLogformat(in *jlexer.Lexer, out *IVTMe
 		in.Consumed()
 	}
 }
-func easyjson3af0d39EncodeGithubComFsWorldLogformat(out *jwriter.Writer, in IVTMessage) {
+func easyjson3af0d39EncodeGithubComFsWorldLogformat1(out *jwriter.Writer, in IVTMessage) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -84,23 +244,23 @@ func easyjson3af0d39EncodeGithubComFsWorldLogformat(out *jwriter.Writer, in IVTM
 // MarshalJSON supports json.Marshaler interface
 func (v IVTMessage) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson3af0d39EncodeGithubComFsWorldLogformat(&w, v)
+	easyjson3af0d39EncodeGithubComFsWorldLogformat1(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v IVTMessage) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson3af0d39EncodeGithubComFsWorldLogformat(w, v)
+	easyjson3af0d39EncodeGithubComFsWorldLogformat1(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *IVTMessage) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson3af0d39DecodeGithubComFsWorldLogformat(&r, v)
+	easyjson3af0d39DecodeGithubComFsWorldLogformat1(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *IVTMessage) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson3af0d39DecodeGithubComFsWorldLogformat(l, v)
+	easyjson3af0d39DecodeGithubComFsWorldLogformat1(l, v)
 }

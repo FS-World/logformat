@@ -187,3 +187,257 @@ func (z *IVTMessage) Msgsize() (s int) {
 	s = 1 + 3 + z.Timestamp.Msgsize() + 2 + msgp.Int32Size + 2 + msgp.Int32Size + 2 + msgp.Int32Size
 	return
 }
+
+// DecodeMsg implements msgp.Decodable
+func (z *IvtBufferedMeasurement) DecodeMsg(dc *msgp.Reader) (err error) {
+	var field []byte
+	_ = field
+	var zb0001 uint32
+	zb0001, err = dc.ReadMapHeader()
+	if err != nil {
+		err = msgp.WrapError(err)
+		return
+	}
+	for zb0001 > 0 {
+		zb0001--
+		field, err = dc.ReadMapKeyPtr()
+		if err != nil {
+			err = msgp.WrapError(err)
+			return
+		}
+		switch msgp.UnsafeString(field) {
+		case "u":
+			var zb0002 uint32
+			zb0002, err = dc.ReadArrayHeader()
+			if err != nil {
+				err = msgp.WrapError(err, "Voltages")
+				return
+			}
+			if zb0002 != uint32(BufferedMeasurementSize) {
+				err = msgp.ArrayError{Wanted: uint32(BufferedMeasurementSize), Got: zb0002}
+				return
+			}
+			for za0001 := range z.Voltages {
+				z.Voltages[za0001], err = dc.ReadInt32()
+				if err != nil {
+					err = msgp.WrapError(err, "Voltages", za0001)
+					return
+				}
+			}
+		case "i":
+			var zb0003 uint32
+			zb0003, err = dc.ReadArrayHeader()
+			if err != nil {
+				err = msgp.WrapError(err, "Currents")
+				return
+			}
+			if zb0003 != uint32(BufferedMeasurementSize) {
+				err = msgp.ArrayError{Wanted: uint32(BufferedMeasurementSize), Got: zb0003}
+				return
+			}
+			for za0002 := range z.Currents {
+				z.Currents[za0002], err = dc.ReadInt32()
+				if err != nil {
+					err = msgp.WrapError(err, "Currents", za0002)
+					return
+				}
+			}
+		case "s":
+			err = z.SegmentStart.DecodeMsg(dc)
+			if err != nil {
+				err = msgp.WrapError(err, "SegmentStart")
+				return
+			}
+		case "e":
+			err = z.SegmentEnd.DecodeMsg(dc)
+			if err != nil {
+				err = msgp.WrapError(err, "SegmentEnd")
+				return
+			}
+		default:
+			err = dc.Skip()
+			if err != nil {
+				err = msgp.WrapError(err)
+				return
+			}
+		}
+	}
+	return
+}
+
+// EncodeMsg implements msgp.Encodable
+func (z *IvtBufferedMeasurement) EncodeMsg(en *msgp.Writer) (err error) {
+	// map header, size 4
+	// write "u"
+	err = en.Append(0x84, 0xa1, 0x75)
+	if err != nil {
+		return
+	}
+	err = en.WriteArrayHeader(uint32(BufferedMeasurementSize))
+	if err != nil {
+		err = msgp.WrapError(err, "Voltages")
+		return
+	}
+	for za0001 := range z.Voltages {
+		err = en.WriteInt32(z.Voltages[za0001])
+		if err != nil {
+			err = msgp.WrapError(err, "Voltages", za0001)
+			return
+		}
+	}
+	// write "i"
+	err = en.Append(0xa1, 0x69)
+	if err != nil {
+		return
+	}
+	err = en.WriteArrayHeader(uint32(BufferedMeasurementSize))
+	if err != nil {
+		err = msgp.WrapError(err, "Currents")
+		return
+	}
+	for za0002 := range z.Currents {
+		err = en.WriteInt32(z.Currents[za0002])
+		if err != nil {
+			err = msgp.WrapError(err, "Currents", za0002)
+			return
+		}
+	}
+	// write "s"
+	err = en.Append(0xa1, 0x73)
+	if err != nil {
+		return
+	}
+	err = z.SegmentStart.EncodeMsg(en)
+	if err != nil {
+		err = msgp.WrapError(err, "SegmentStart")
+		return
+	}
+	// write "e"
+	err = en.Append(0xa1, 0x65)
+	if err != nil {
+		return
+	}
+	err = z.SegmentEnd.EncodeMsg(en)
+	if err != nil {
+		err = msgp.WrapError(err, "SegmentEnd")
+		return
+	}
+	return
+}
+
+// MarshalMsg implements msgp.Marshaler
+func (z *IvtBufferedMeasurement) MarshalMsg(b []byte) (o []byte, err error) {
+	o = msgp.Require(b, z.Msgsize())
+	// map header, size 4
+	// string "u"
+	o = append(o, 0x84, 0xa1, 0x75)
+	o = msgp.AppendArrayHeader(o, uint32(BufferedMeasurementSize))
+	for za0001 := range z.Voltages {
+		o = msgp.AppendInt32(o, z.Voltages[za0001])
+	}
+	// string "i"
+	o = append(o, 0xa1, 0x69)
+	o = msgp.AppendArrayHeader(o, uint32(BufferedMeasurementSize))
+	for za0002 := range z.Currents {
+		o = msgp.AppendInt32(o, z.Currents[za0002])
+	}
+	// string "s"
+	o = append(o, 0xa1, 0x73)
+	o, err = z.SegmentStart.MarshalMsg(o)
+	if err != nil {
+		err = msgp.WrapError(err, "SegmentStart")
+		return
+	}
+	// string "e"
+	o = append(o, 0xa1, 0x65)
+	o, err = z.SegmentEnd.MarshalMsg(o)
+	if err != nil {
+		err = msgp.WrapError(err, "SegmentEnd")
+		return
+	}
+	return
+}
+
+// UnmarshalMsg implements msgp.Unmarshaler
+func (z *IvtBufferedMeasurement) UnmarshalMsg(bts []byte) (o []byte, err error) {
+	var field []byte
+	_ = field
+	var zb0001 uint32
+	zb0001, bts, err = msgp.ReadMapHeaderBytes(bts)
+	if err != nil {
+		err = msgp.WrapError(err)
+		return
+	}
+	for zb0001 > 0 {
+		zb0001--
+		field, bts, err = msgp.ReadMapKeyZC(bts)
+		if err != nil {
+			err = msgp.WrapError(err)
+			return
+		}
+		switch msgp.UnsafeString(field) {
+		case "u":
+			var zb0002 uint32
+			zb0002, bts, err = msgp.ReadArrayHeaderBytes(bts)
+			if err != nil {
+				err = msgp.WrapError(err, "Voltages")
+				return
+			}
+			if zb0002 != uint32(BufferedMeasurementSize) {
+				err = msgp.ArrayError{Wanted: uint32(BufferedMeasurementSize), Got: zb0002}
+				return
+			}
+			for za0001 := range z.Voltages {
+				z.Voltages[za0001], bts, err = msgp.ReadInt32Bytes(bts)
+				if err != nil {
+					err = msgp.WrapError(err, "Voltages", za0001)
+					return
+				}
+			}
+		case "i":
+			var zb0003 uint32
+			zb0003, bts, err = msgp.ReadArrayHeaderBytes(bts)
+			if err != nil {
+				err = msgp.WrapError(err, "Currents")
+				return
+			}
+			if zb0003 != uint32(BufferedMeasurementSize) {
+				err = msgp.ArrayError{Wanted: uint32(BufferedMeasurementSize), Got: zb0003}
+				return
+			}
+			for za0002 := range z.Currents {
+				z.Currents[za0002], bts, err = msgp.ReadInt32Bytes(bts)
+				if err != nil {
+					err = msgp.WrapError(err, "Currents", za0002)
+					return
+				}
+			}
+		case "s":
+			bts, err = z.SegmentStart.UnmarshalMsg(bts)
+			if err != nil {
+				err = msgp.WrapError(err, "SegmentStart")
+				return
+			}
+		case "e":
+			bts, err = z.SegmentEnd.UnmarshalMsg(bts)
+			if err != nil {
+				err = msgp.WrapError(err, "SegmentEnd")
+				return
+			}
+		default:
+			bts, err = msgp.Skip(bts)
+			if err != nil {
+				err = msgp.WrapError(err)
+				return
+			}
+		}
+	}
+	o = bts
+	return
+}
+
+// Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
+func (z *IvtBufferedMeasurement) Msgsize() (s int) {
+	s = 1 + 2 + msgp.ArrayHeaderSize + (BufferedMeasurementSize * (msgp.Int32Size)) + 2 + msgp.ArrayHeaderSize + (BufferedMeasurementSize * (msgp.Int32Size)) + 2 + z.SegmentStart.Msgsize() + 2 + z.SegmentEnd.Msgsize()
+	return
+}

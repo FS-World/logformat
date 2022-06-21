@@ -14,7 +14,7 @@ const (
 
 func TestCANLogWriterReader(t *testing.T) {
 	testFile := "test.bin"
-	w, err := NewSerializedLogWriter(testFile)
+	w, err := NewSerializedLogWriter[*CANFrame](testFile)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -25,7 +25,7 @@ func TestCANLogWriterReader(t *testing.T) {
 		DLC:               8,
 		Data:              []byte{0, 1, 2, 3, 4, 5, 6, 7},
 	}
-	expected := make([]Serializable, testSize)
+	expected := make([]*CANFrame, testSize)
 	for i := 0; i < testSize; i++ {
 		// fill data with semi-random values
 		m.ID = uint32(i)
@@ -48,11 +48,11 @@ func TestCANLogWriterReader(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	r, err := NewSerializedLogReader(testFile, &CANFrame{})
+	r, err := NewSerializedLogReader[*CANFrame](testFile)
 	if err != nil {
 		t.Fatal(err)
 	}
-	frames, gotHash, err := r.ReadAll()
+	frames, gotHash, err := r.ReadAll(&CANFrame{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -79,12 +79,12 @@ func TestCANLogWriterReader(t *testing.T) {
 
 func TestIVTLogWriterReader(t *testing.T) {
 	testFile := "test_ivt.bin"
-	w, err := NewSerializedLogWriter(testFile)
+	w, err := NewSerializedLogWriter[*IVTMessage](testFile)
 	if err != nil {
 		t.Fatal(err)
 	}
 	var m IVTMessage
-	expected := make([]Serializable, testSize)
+	expected := make([]*IVTMessage, testSize)
 	for i := 0; i < testSize; i++ {
 		// fill data with semi-random values
 		m.Timestamp.Sec = int32(i)
@@ -106,11 +106,11 @@ func TestIVTLogWriterReader(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	r, err := NewSerializedLogReader(testFile, &m)
+	r, err := NewSerializedLogReader[*IVTMessage](testFile)
 	if err != nil {
 		t.Fatal(err)
 	}
-	frames, gotHash, err := r.ReadAll()
+	frames, gotHash, err := r.ReadAll(&IVTMessage{})
 	if err != nil {
 		t.Fatal(err)
 	}
