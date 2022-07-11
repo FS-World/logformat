@@ -87,6 +87,74 @@ func easyjson3af0d39DecodeGithubComFsWorldLogformat(in *jlexer.Lexer, out *IvtBu
 				}
 				in.Delim(']')
 			}
+		case "us":
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				in.Delim('[')
+				v4 := 0
+				for !in.IsDelim(']') {
+					if v4 < 11 {
+						(out.LVSupplyVoltage)[v4] = float32(in.Float32())
+						v4++
+					} else {
+						in.SkipRecursive()
+					}
+					in.WantComma()
+				}
+				in.Delim(']')
+			}
+		case "ui":
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				in.Delim('[')
+				v5 := 0
+				for !in.IsDelim(']') {
+					if v5 < 11 {
+						(out.IVTSupplyVoltage)[v5] = float32(in.Float32())
+						v5++
+					} else {
+						in.SkipRecursive()
+					}
+					in.WantComma()
+				}
+				in.Delim(']')
+			}
+		case "pg5":
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				in.Delim('[')
+				v6 := 0
+				for !in.IsDelim(']') {
+					if v6 < 11 {
+						(out.PGood5V)[v6] = bool(in.Bool())
+						v6++
+					} else {
+						in.SkipRecursive()
+					}
+					in.WantComma()
+				}
+				in.Delim(']')
+			}
+		case "pg3v3":
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				in.Delim('[')
+				v7 := 0
+				for !in.IsDelim(']') {
+					if v7 < 11 {
+						(out.PGood3V3)[v7] = bool(in.Bool())
+						v7++
+					} else {
+						in.SkipRecursive()
+					}
+					in.WantComma()
+				}
+				in.Delim(']')
+			}
 		case "s":
 			(out.SegmentStart).UnmarshalEasyJSON(in)
 		case "e":
@@ -109,11 +177,11 @@ func easyjson3af0d39EncodeGithubComFsWorldLogformat(out *jwriter.Writer, in IvtB
 		const prefix string = ",\"u\":"
 		out.RawString(prefix[1:])
 		out.RawByte('[')
-		for v4 := range in.Voltages {
-			if v4 > 0 {
+		for v8 := range in.Voltages {
+			if v8 > 0 {
 				out.RawByte(',')
 			}
-			out.Int32(int32((in.Voltages)[v4]))
+			out.Int32(int32((in.Voltages)[v8]))
 		}
 		out.RawByte(']')
 	}
@@ -121,11 +189,11 @@ func easyjson3af0d39EncodeGithubComFsWorldLogformat(out *jwriter.Writer, in IvtB
 		const prefix string = ",\"i\":"
 		out.RawString(prefix)
 		out.RawByte('[')
-		for v5 := range in.Currents {
-			if v5 > 0 {
+		for v9 := range in.Currents {
+			if v9 > 0 {
 				out.RawByte(',')
 			}
-			out.Int32(int32((in.Currents)[v5]))
+			out.Int32(int32((in.Currents)[v9]))
 		}
 		out.RawByte(']')
 	}
@@ -133,11 +201,59 @@ func easyjson3af0d39EncodeGithubComFsWorldLogformat(out *jwriter.Writer, in IvtB
 		const prefix string = ",\"t\":"
 		out.RawString(prefix)
 		out.RawByte('[')
-		for v6 := range in.Temperatures {
-			if v6 > 0 {
+		for v10 := range in.Temperatures {
+			if v10 > 0 {
 				out.RawByte(',')
 			}
-			out.Int32(int32((in.Temperatures)[v6]))
+			out.Int32(int32((in.Temperatures)[v10]))
+		}
+		out.RawByte(']')
+	}
+	{
+		const prefix string = ",\"us\":"
+		out.RawString(prefix)
+		out.RawByte('[')
+		for v11 := range in.LVSupplyVoltage {
+			if v11 > 0 {
+				out.RawByte(',')
+			}
+			out.Float32(float32((in.LVSupplyVoltage)[v11]))
+		}
+		out.RawByte(']')
+	}
+	{
+		const prefix string = ",\"ui\":"
+		out.RawString(prefix)
+		out.RawByte('[')
+		for v12 := range in.IVTSupplyVoltage {
+			if v12 > 0 {
+				out.RawByte(',')
+			}
+			out.Float32(float32((in.IVTSupplyVoltage)[v12]))
+		}
+		out.RawByte(']')
+	}
+	{
+		const prefix string = ",\"pg5\":"
+		out.RawString(prefix)
+		out.RawByte('[')
+		for v13 := range in.PGood5V {
+			if v13 > 0 {
+				out.RawByte(',')
+			}
+			out.Bool(bool((in.PGood5V)[v13]))
+		}
+		out.RawByte(']')
+	}
+	{
+		const prefix string = ",\"pg3v3\":"
+		out.RawString(prefix)
+		out.RawByte('[')
+		for v14 := range in.PGood3V3 {
+			if v14 > 0 {
+				out.RawByte(',')
+			}
+			out.Bool(bool((in.PGood3V3)[v14]))
 		}
 		out.RawByte(']')
 	}
