@@ -7,7 +7,7 @@ import (
 )
 
 // DecodeMsg implements msgp.Decodable
-func (z *IVTMessage) DecodeMsg(dc *msgp.Reader) (err error) {
+func (z *IvtBufferedMeasurement) DecodeMsg(dc *msgp.Reader) (err error) {
 	var field []byte
 	_ = field
 	var zb0001 uint32
@@ -24,28 +24,142 @@ func (z *IVTMessage) DecodeMsg(dc *msgp.Reader) (err error) {
 			return
 		}
 		switch msgp.UnsafeString(field) {
-		case "ts":
-			err = z.Timestamp.DecodeMsg(dc)
+		case "u":
+			var zb0002 uint32
+			zb0002, err = dc.ReadArrayHeader()
 			if err != nil {
-				err = msgp.WrapError(err, "Timestamp")
+				err = msgp.WrapError(err, "Voltages")
 				return
 			}
-		case "u":
-			z.Voltage, err = dc.ReadInt32()
-			if err != nil {
-				err = msgp.WrapError(err, "Voltage")
+			if zb0002 != uint32(BufferedMeasurementSize) {
+				err = msgp.ArrayError{Wanted: uint32(BufferedMeasurementSize), Got: zb0002}
 				return
+			}
+			for za0001 := range z.Voltages {
+				z.Voltages[za0001], err = dc.ReadInt32()
+				if err != nil {
+					err = msgp.WrapError(err, "Voltages", za0001)
+					return
+				}
 			}
 		case "i":
-			z.Current, err = dc.ReadInt32()
+			var zb0003 uint32
+			zb0003, err = dc.ReadArrayHeader()
 			if err != nil {
-				err = msgp.WrapError(err, "Current")
+				err = msgp.WrapError(err, "Currents")
 				return
 			}
+			if zb0003 != uint32(BufferedMeasurementSize) {
+				err = msgp.ArrayError{Wanted: uint32(BufferedMeasurementSize), Got: zb0003}
+				return
+			}
+			for za0002 := range z.Currents {
+				z.Currents[za0002], err = dc.ReadInt32()
+				if err != nil {
+					err = msgp.WrapError(err, "Currents", za0002)
+					return
+				}
+			}
 		case "t":
-			z.Temperature, err = dc.ReadInt32()
+			var zb0004 uint32
+			zb0004, err = dc.ReadArrayHeader()
 			if err != nil {
-				err = msgp.WrapError(err, "Temperature")
+				err = msgp.WrapError(err, "Temperatures")
+				return
+			}
+			if zb0004 != uint32(BufferedMeasurementSizeIvt) {
+				err = msgp.ArrayError{Wanted: uint32(BufferedMeasurementSizeIvt), Got: zb0004}
+				return
+			}
+			for za0003 := range z.Temperatures {
+				z.Temperatures[za0003], err = dc.ReadInt32()
+				if err != nil {
+					err = msgp.WrapError(err, "Temperatures", za0003)
+					return
+				}
+			}
+		case "us":
+			var zb0005 uint32
+			zb0005, err = dc.ReadArrayHeader()
+			if err != nil {
+				err = msgp.WrapError(err, "LVSupplyVoltage")
+				return
+			}
+			if zb0005 != uint32(BufferedMeasurementSizeAux) {
+				err = msgp.ArrayError{Wanted: uint32(BufferedMeasurementSizeAux), Got: zb0005}
+				return
+			}
+			for za0004 := range z.LVSupplyVoltage {
+				z.LVSupplyVoltage[za0004], err = dc.ReadFloat32()
+				if err != nil {
+					err = msgp.WrapError(err, "LVSupplyVoltage", za0004)
+					return
+				}
+			}
+		case "ui":
+			var zb0006 uint32
+			zb0006, err = dc.ReadArrayHeader()
+			if err != nil {
+				err = msgp.WrapError(err, "IVTSupplyVoltage")
+				return
+			}
+			if zb0006 != uint32(BufferedMeasurementSizeAux) {
+				err = msgp.ArrayError{Wanted: uint32(BufferedMeasurementSizeAux), Got: zb0006}
+				return
+			}
+			for za0005 := range z.IVTSupplyVoltage {
+				z.IVTSupplyVoltage[za0005], err = dc.ReadFloat32()
+				if err != nil {
+					err = msgp.WrapError(err, "IVTSupplyVoltage", za0005)
+					return
+				}
+			}
+		case "pg5":
+			var zb0007 uint32
+			zb0007, err = dc.ReadArrayHeader()
+			if err != nil {
+				err = msgp.WrapError(err, "PGood5V")
+				return
+			}
+			if zb0007 != uint32(BufferedMeasurementSizeAux) {
+				err = msgp.ArrayError{Wanted: uint32(BufferedMeasurementSizeAux), Got: zb0007}
+				return
+			}
+			for za0006 := range z.PGood5V {
+				z.PGood5V[za0006], err = dc.ReadBool()
+				if err != nil {
+					err = msgp.WrapError(err, "PGood5V", za0006)
+					return
+				}
+			}
+		case "pg3v3":
+			var zb0008 uint32
+			zb0008, err = dc.ReadArrayHeader()
+			if err != nil {
+				err = msgp.WrapError(err, "PGood3V3")
+				return
+			}
+			if zb0008 != uint32(BufferedMeasurementSizeAux) {
+				err = msgp.ArrayError{Wanted: uint32(BufferedMeasurementSizeAux), Got: zb0008}
+				return
+			}
+			for za0007 := range z.PGood3V3 {
+				z.PGood3V3[za0007], err = dc.ReadBool()
+				if err != nil {
+					err = msgp.WrapError(err, "PGood3V3", za0007)
+					return
+				}
+			}
+		case "s":
+			err = z.SegmentStart.DecodeMsg(dc)
+			if err != nil {
+				err = msgp.WrapError(err, "SegmentStart")
+				return
+			}
+		case "e":
+			err = z.SegmentEnd.DecodeMsg(dc)
+			if err != nil {
+				err = msgp.WrapError(err, "SegmentEnd")
 				return
 			}
 		default:
@@ -60,76 +174,215 @@ func (z *IVTMessage) DecodeMsg(dc *msgp.Reader) (err error) {
 }
 
 // EncodeMsg implements msgp.Encodable
-func (z *IVTMessage) EncodeMsg(en *msgp.Writer) (err error) {
-	// map header, size 4
-	// write "ts"
-	err = en.Append(0x84, 0xa2, 0x74, 0x73)
-	if err != nil {
-		return
-	}
-	err = z.Timestamp.EncodeMsg(en)
-	if err != nil {
-		err = msgp.WrapError(err, "Timestamp")
-		return
-	}
+func (z *IvtBufferedMeasurement) EncodeMsg(en *msgp.Writer) (err error) {
+	// map header, size 9
 	// write "u"
-	err = en.Append(0xa1, 0x75)
+	err = en.Append(0x89, 0xa1, 0x75)
 	if err != nil {
 		return
 	}
-	err = en.WriteInt32(z.Voltage)
+	err = en.WriteArrayHeader(uint32(BufferedMeasurementSize))
 	if err != nil {
-		err = msgp.WrapError(err, "Voltage")
+		err = msgp.WrapError(err, "Voltages")
 		return
+	}
+	for za0001 := range z.Voltages {
+		err = en.WriteInt32(z.Voltages[za0001])
+		if err != nil {
+			err = msgp.WrapError(err, "Voltages", za0001)
+			return
+		}
 	}
 	// write "i"
 	err = en.Append(0xa1, 0x69)
 	if err != nil {
 		return
 	}
-	err = en.WriteInt32(z.Current)
+	err = en.WriteArrayHeader(uint32(BufferedMeasurementSize))
 	if err != nil {
-		err = msgp.WrapError(err, "Current")
+		err = msgp.WrapError(err, "Currents")
 		return
+	}
+	for za0002 := range z.Currents {
+		err = en.WriteInt32(z.Currents[za0002])
+		if err != nil {
+			err = msgp.WrapError(err, "Currents", za0002)
+			return
+		}
 	}
 	// write "t"
 	err = en.Append(0xa1, 0x74)
 	if err != nil {
 		return
 	}
-	err = en.WriteInt32(z.Temperature)
+	err = en.WriteArrayHeader(uint32(BufferedMeasurementSizeIvt))
 	if err != nil {
-		err = msgp.WrapError(err, "Temperature")
+		err = msgp.WrapError(err, "Temperatures")
+		return
+	}
+	for za0003 := range z.Temperatures {
+		err = en.WriteInt32(z.Temperatures[za0003])
+		if err != nil {
+			err = msgp.WrapError(err, "Temperatures", za0003)
+			return
+		}
+	}
+	// write "us"
+	err = en.Append(0xa2, 0x75, 0x73)
+	if err != nil {
+		return
+	}
+	err = en.WriteArrayHeader(uint32(BufferedMeasurementSizeAux))
+	if err != nil {
+		err = msgp.WrapError(err, "LVSupplyVoltage")
+		return
+	}
+	for za0004 := range z.LVSupplyVoltage {
+		err = en.WriteFloat32(z.LVSupplyVoltage[za0004])
+		if err != nil {
+			err = msgp.WrapError(err, "LVSupplyVoltage", za0004)
+			return
+		}
+	}
+	// write "ui"
+	err = en.Append(0xa2, 0x75, 0x69)
+	if err != nil {
+		return
+	}
+	err = en.WriteArrayHeader(uint32(BufferedMeasurementSizeAux))
+	if err != nil {
+		err = msgp.WrapError(err, "IVTSupplyVoltage")
+		return
+	}
+	for za0005 := range z.IVTSupplyVoltage {
+		err = en.WriteFloat32(z.IVTSupplyVoltage[za0005])
+		if err != nil {
+			err = msgp.WrapError(err, "IVTSupplyVoltage", za0005)
+			return
+		}
+	}
+	// write "pg5"
+	err = en.Append(0xa3, 0x70, 0x67, 0x35)
+	if err != nil {
+		return
+	}
+	err = en.WriteArrayHeader(uint32(BufferedMeasurementSizeAux))
+	if err != nil {
+		err = msgp.WrapError(err, "PGood5V")
+		return
+	}
+	for za0006 := range z.PGood5V {
+		err = en.WriteBool(z.PGood5V[za0006])
+		if err != nil {
+			err = msgp.WrapError(err, "PGood5V", za0006)
+			return
+		}
+	}
+	// write "pg3v3"
+	err = en.Append(0xa5, 0x70, 0x67, 0x33, 0x76, 0x33)
+	if err != nil {
+		return
+	}
+	err = en.WriteArrayHeader(uint32(BufferedMeasurementSizeAux))
+	if err != nil {
+		err = msgp.WrapError(err, "PGood3V3")
+		return
+	}
+	for za0007 := range z.PGood3V3 {
+		err = en.WriteBool(z.PGood3V3[za0007])
+		if err != nil {
+			err = msgp.WrapError(err, "PGood3V3", za0007)
+			return
+		}
+	}
+	// write "s"
+	err = en.Append(0xa1, 0x73)
+	if err != nil {
+		return
+	}
+	err = z.SegmentStart.EncodeMsg(en)
+	if err != nil {
+		err = msgp.WrapError(err, "SegmentStart")
+		return
+	}
+	// write "e"
+	err = en.Append(0xa1, 0x65)
+	if err != nil {
+		return
+	}
+	err = z.SegmentEnd.EncodeMsg(en)
+	if err != nil {
+		err = msgp.WrapError(err, "SegmentEnd")
 		return
 	}
 	return
 }
 
 // MarshalMsg implements msgp.Marshaler
-func (z *IVTMessage) MarshalMsg(b []byte) (o []byte, err error) {
+func (z *IvtBufferedMeasurement) MarshalMsg(b []byte) (o []byte, err error) {
 	o = msgp.Require(b, z.Msgsize())
-	// map header, size 4
-	// string "ts"
-	o = append(o, 0x84, 0xa2, 0x74, 0x73)
-	o, err = z.Timestamp.MarshalMsg(o)
-	if err != nil {
-		err = msgp.WrapError(err, "Timestamp")
-		return
-	}
+	// map header, size 9
 	// string "u"
-	o = append(o, 0xa1, 0x75)
-	o = msgp.AppendInt32(o, z.Voltage)
+	o = append(o, 0x89, 0xa1, 0x75)
+	o = msgp.AppendArrayHeader(o, uint32(BufferedMeasurementSize))
+	for za0001 := range z.Voltages {
+		o = msgp.AppendInt32(o, z.Voltages[za0001])
+	}
 	// string "i"
 	o = append(o, 0xa1, 0x69)
-	o = msgp.AppendInt32(o, z.Current)
+	o = msgp.AppendArrayHeader(o, uint32(BufferedMeasurementSize))
+	for za0002 := range z.Currents {
+		o = msgp.AppendInt32(o, z.Currents[za0002])
+	}
 	// string "t"
 	o = append(o, 0xa1, 0x74)
-	o = msgp.AppendInt32(o, z.Temperature)
+	o = msgp.AppendArrayHeader(o, uint32(BufferedMeasurementSizeIvt))
+	for za0003 := range z.Temperatures {
+		o = msgp.AppendInt32(o, z.Temperatures[za0003])
+	}
+	// string "us"
+	o = append(o, 0xa2, 0x75, 0x73)
+	o = msgp.AppendArrayHeader(o, uint32(BufferedMeasurementSizeAux))
+	for za0004 := range z.LVSupplyVoltage {
+		o = msgp.AppendFloat32(o, z.LVSupplyVoltage[za0004])
+	}
+	// string "ui"
+	o = append(o, 0xa2, 0x75, 0x69)
+	o = msgp.AppendArrayHeader(o, uint32(BufferedMeasurementSizeAux))
+	for za0005 := range z.IVTSupplyVoltage {
+		o = msgp.AppendFloat32(o, z.IVTSupplyVoltage[za0005])
+	}
+	// string "pg5"
+	o = append(o, 0xa3, 0x70, 0x67, 0x35)
+	o = msgp.AppendArrayHeader(o, uint32(BufferedMeasurementSizeAux))
+	for za0006 := range z.PGood5V {
+		o = msgp.AppendBool(o, z.PGood5V[za0006])
+	}
+	// string "pg3v3"
+	o = append(o, 0xa5, 0x70, 0x67, 0x33, 0x76, 0x33)
+	o = msgp.AppendArrayHeader(o, uint32(BufferedMeasurementSizeAux))
+	for za0007 := range z.PGood3V3 {
+		o = msgp.AppendBool(o, z.PGood3V3[za0007])
+	}
+	// string "s"
+	o = append(o, 0xa1, 0x73)
+	o, err = z.SegmentStart.MarshalMsg(o)
+	if err != nil {
+		err = msgp.WrapError(err, "SegmentStart")
+		return
+	}
+	// string "e"
+	o = append(o, 0xa1, 0x65)
+	o, err = z.SegmentEnd.MarshalMsg(o)
+	if err != nil {
+		err = msgp.WrapError(err, "SegmentEnd")
+		return
+	}
 	return
 }
 
 // UnmarshalMsg implements msgp.Unmarshaler
-func (z *IVTMessage) UnmarshalMsg(bts []byte) (o []byte, err error) {
+func (z *IvtBufferedMeasurement) UnmarshalMsg(bts []byte) (o []byte, err error) {
 	var field []byte
 	_ = field
 	var zb0001 uint32
@@ -146,28 +399,142 @@ func (z *IVTMessage) UnmarshalMsg(bts []byte) (o []byte, err error) {
 			return
 		}
 		switch msgp.UnsafeString(field) {
-		case "ts":
-			bts, err = z.Timestamp.UnmarshalMsg(bts)
+		case "u":
+			var zb0002 uint32
+			zb0002, bts, err = msgp.ReadArrayHeaderBytes(bts)
 			if err != nil {
-				err = msgp.WrapError(err, "Timestamp")
+				err = msgp.WrapError(err, "Voltages")
 				return
 			}
-		case "u":
-			z.Voltage, bts, err = msgp.ReadInt32Bytes(bts)
-			if err != nil {
-				err = msgp.WrapError(err, "Voltage")
+			if zb0002 != uint32(BufferedMeasurementSize) {
+				err = msgp.ArrayError{Wanted: uint32(BufferedMeasurementSize), Got: zb0002}
 				return
+			}
+			for za0001 := range z.Voltages {
+				z.Voltages[za0001], bts, err = msgp.ReadInt32Bytes(bts)
+				if err != nil {
+					err = msgp.WrapError(err, "Voltages", za0001)
+					return
+				}
 			}
 		case "i":
-			z.Current, bts, err = msgp.ReadInt32Bytes(bts)
+			var zb0003 uint32
+			zb0003, bts, err = msgp.ReadArrayHeaderBytes(bts)
 			if err != nil {
-				err = msgp.WrapError(err, "Current")
+				err = msgp.WrapError(err, "Currents")
 				return
 			}
+			if zb0003 != uint32(BufferedMeasurementSize) {
+				err = msgp.ArrayError{Wanted: uint32(BufferedMeasurementSize), Got: zb0003}
+				return
+			}
+			for za0002 := range z.Currents {
+				z.Currents[za0002], bts, err = msgp.ReadInt32Bytes(bts)
+				if err != nil {
+					err = msgp.WrapError(err, "Currents", za0002)
+					return
+				}
+			}
 		case "t":
-			z.Temperature, bts, err = msgp.ReadInt32Bytes(bts)
+			var zb0004 uint32
+			zb0004, bts, err = msgp.ReadArrayHeaderBytes(bts)
 			if err != nil {
-				err = msgp.WrapError(err, "Temperature")
+				err = msgp.WrapError(err, "Temperatures")
+				return
+			}
+			if zb0004 != uint32(BufferedMeasurementSizeIvt) {
+				err = msgp.ArrayError{Wanted: uint32(BufferedMeasurementSizeIvt), Got: zb0004}
+				return
+			}
+			for za0003 := range z.Temperatures {
+				z.Temperatures[za0003], bts, err = msgp.ReadInt32Bytes(bts)
+				if err != nil {
+					err = msgp.WrapError(err, "Temperatures", za0003)
+					return
+				}
+			}
+		case "us":
+			var zb0005 uint32
+			zb0005, bts, err = msgp.ReadArrayHeaderBytes(bts)
+			if err != nil {
+				err = msgp.WrapError(err, "LVSupplyVoltage")
+				return
+			}
+			if zb0005 != uint32(BufferedMeasurementSizeAux) {
+				err = msgp.ArrayError{Wanted: uint32(BufferedMeasurementSizeAux), Got: zb0005}
+				return
+			}
+			for za0004 := range z.LVSupplyVoltage {
+				z.LVSupplyVoltage[za0004], bts, err = msgp.ReadFloat32Bytes(bts)
+				if err != nil {
+					err = msgp.WrapError(err, "LVSupplyVoltage", za0004)
+					return
+				}
+			}
+		case "ui":
+			var zb0006 uint32
+			zb0006, bts, err = msgp.ReadArrayHeaderBytes(bts)
+			if err != nil {
+				err = msgp.WrapError(err, "IVTSupplyVoltage")
+				return
+			}
+			if zb0006 != uint32(BufferedMeasurementSizeAux) {
+				err = msgp.ArrayError{Wanted: uint32(BufferedMeasurementSizeAux), Got: zb0006}
+				return
+			}
+			for za0005 := range z.IVTSupplyVoltage {
+				z.IVTSupplyVoltage[za0005], bts, err = msgp.ReadFloat32Bytes(bts)
+				if err != nil {
+					err = msgp.WrapError(err, "IVTSupplyVoltage", za0005)
+					return
+				}
+			}
+		case "pg5":
+			var zb0007 uint32
+			zb0007, bts, err = msgp.ReadArrayHeaderBytes(bts)
+			if err != nil {
+				err = msgp.WrapError(err, "PGood5V")
+				return
+			}
+			if zb0007 != uint32(BufferedMeasurementSizeAux) {
+				err = msgp.ArrayError{Wanted: uint32(BufferedMeasurementSizeAux), Got: zb0007}
+				return
+			}
+			for za0006 := range z.PGood5V {
+				z.PGood5V[za0006], bts, err = msgp.ReadBoolBytes(bts)
+				if err != nil {
+					err = msgp.WrapError(err, "PGood5V", za0006)
+					return
+				}
+			}
+		case "pg3v3":
+			var zb0008 uint32
+			zb0008, bts, err = msgp.ReadArrayHeaderBytes(bts)
+			if err != nil {
+				err = msgp.WrapError(err, "PGood3V3")
+				return
+			}
+			if zb0008 != uint32(BufferedMeasurementSizeAux) {
+				err = msgp.ArrayError{Wanted: uint32(BufferedMeasurementSizeAux), Got: zb0008}
+				return
+			}
+			for za0007 := range z.PGood3V3 {
+				z.PGood3V3[za0007], bts, err = msgp.ReadBoolBytes(bts)
+				if err != nil {
+					err = msgp.WrapError(err, "PGood3V3", za0007)
+					return
+				}
+			}
+		case "s":
+			bts, err = z.SegmentStart.UnmarshalMsg(bts)
+			if err != nil {
+				err = msgp.WrapError(err, "SegmentStart")
+				return
+			}
+		case "e":
+			bts, err = z.SegmentEnd.UnmarshalMsg(bts)
+			if err != nil {
+				err = msgp.WrapError(err, "SegmentEnd")
 				return
 			}
 		default:
@@ -183,7 +550,7 @@ func (z *IVTMessage) UnmarshalMsg(bts []byte) (o []byte, err error) {
 }
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
-func (z *IVTMessage) Msgsize() (s int) {
-	s = 1 + 3 + z.Timestamp.Msgsize() + 2 + msgp.Int32Size + 2 + msgp.Int32Size + 2 + msgp.Int32Size
+func (z *IvtBufferedMeasurement) Msgsize() (s int) {
+	s = 1 + 2 + msgp.ArrayHeaderSize + (BufferedMeasurementSize * (msgp.Int32Size)) + 2 + msgp.ArrayHeaderSize + (BufferedMeasurementSize * (msgp.Int32Size)) + 2 + msgp.ArrayHeaderSize + (BufferedMeasurementSizeIvt * (msgp.Int32Size)) + 3 + msgp.ArrayHeaderSize + (BufferedMeasurementSizeAux * (msgp.Float32Size)) + 3 + msgp.ArrayHeaderSize + (BufferedMeasurementSizeAux * (msgp.Float32Size)) + 4 + msgp.ArrayHeaderSize + (BufferedMeasurementSizeAux * (msgp.BoolSize)) + 6 + msgp.ArrayHeaderSize + (BufferedMeasurementSizeAux * (msgp.BoolSize)) + 2 + z.SegmentStart.Msgsize() + 2 + z.SegmentEnd.Msgsize()
 	return
 }

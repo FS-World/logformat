@@ -1,12 +1,11 @@
 package logformat
 
 import (
-	"io"
-	"os"
-
 	"github.com/pkg/errors"
 	"github.com/tinylib/msgp/msgp"
 	"github.com/zeebo/blake3"
+	"io"
+	"os"
 )
 
 // SerializedLogWriter writes Serializable messages to a logfile and hashes the logfile in the background.
@@ -18,10 +17,9 @@ type SerializedLogWriter struct {
 
 // SerializedLogReader is a reader for log files with Serializable messages. It hashes the input file in the background.
 type SerializedLogReader struct {
-	r        *msgp.Reader   // r is the reader instance
-	f        *os.File       // f is the file we read from
-	dataType Serializable   // dataType is the type of logdata we want to decode to
-	h        *blake3.Hasher // h is the hash function
+	r *msgp.Reader   // r is the reader instance
+	f *os.File       // f is the file we read from
+	h *blake3.Hasher // h is the hash function
 }
 
 // NewSerializedLogWriter creates a new LogWriter
@@ -33,13 +31,18 @@ func NewSerializedLogWriter(filename string) (*SerializedLogWriter, error) {
 		return nil, errors.Wrapf(err, "error opening file %s for writing", filename)
 	}
 	w.h = blake3.New()
-	w.w = msgp.NewWriter(io.MultiWriter(w.f, w.h))
+	w.w = msgp.NewWriter(io.MultiWriter(w.h, w.f))
 	return w, nil
 }
 
 // Write writes a message to the logfile
-func (w *SerializedLogWriter) Write(msg Serializable) error {
-	return msg.EncodeMsg(w.w)
+func (w *SerializedLogWriter) Write(msg msgp.Encodable) error {
+	err := msg.EncodeMsg(w.w)
+	if err != nil {
+		return err
+	}
+	err = w.w.Flush()
+	return err
 }
 
 // Sync flushes the internal buffers and syncs the logfile to disk
@@ -61,9 +64,8 @@ func (w *SerializedLogWriter) Close() ([]byte, error) {
 }
 
 // NewSerializedLogReader creates a new SerializedLogReader from the provided file for the provided dataType
-func NewSerializedLogReader(filename string, dataType Serializable) (*SerializedLogReader, error) {
+func NewSerializedLogReader(filename string) (*SerializedLogReader, error) {
 	r := new(SerializedLogReader)
-	r.dataType = dataType
 	var err error
 	r.f, err = os.Open(filename)
 	if err != nil {
@@ -74,17 +76,35 @@ func NewSerializedLogReader(filename string, dataType Serializable) (*Serialized
 	return r, nil
 }
 
-// ReadAll reads all messages from the log; returns the data and blake3 hash on success
-func (r *SerializedLogReader) ReadAll() ([]Serializable, []byte, error) {
-	var msgs []Serializable
+// ReadAllCanFrames reads messages of type CANFrame from logfile.
+// return slice of all messages, b3 hash of logfile and error
+func (r *SerializedLogReader) ReadAllCanFrames() ([]CANFrame, []byte, error) {
+	var msgs []CANFrame
 	for {
-		err := r.dataType.DecodeMsg(r.r)
+		var data CANFrame
+		err := data.DecodeMsg(r.r)
 		if err == msgp.WrapError(io.EOF) {
 			return msgs, r.h.Sum(nil), nil
 		} else if err != nil {
 			return msgs, nil, errors.Wrap(err, "error decoding msg")
 		}
-		msgs = append(msgs, r.dataType)
+		msgs = append(msgs, data)
+	}
+}
+
+// ReadAllIvtBufferedMessages reads messages of type IvtBufferedMeasurement from logfile.
+// return slice of all messages, b3 hash of logfile and error
+func (r *SerializedLogReader) ReadAllIvtBufferedMessages() ([]IvtBufferedMeasurement, []byte, error) {
+	var msgs []IvtBufferedMeasurement
+	for {
+		var data IvtBufferedMeasurement
+		err := data.DecodeMsg(r.r)
+		if err == msgp.WrapError(io.EOF) {
+			return msgs, r.h.Sum(nil), nil
+		} else if err != nil {
+			return msgs, nil, errors.Wrap(err, "error decoding msg")
+		}
+		msgs = append(msgs, data)
 	}
 }
 

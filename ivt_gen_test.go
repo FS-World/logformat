@@ -9,8 +9,8 @@ import (
 	"github.com/tinylib/msgp/msgp"
 )
 
-func TestMarshalUnmarshalIVTMessage(t *testing.T) {
-	v := IVTMessage{}
+func TestMarshalUnmarshalIvtBufferedMeasurement(t *testing.T) {
+	v := IvtBufferedMeasurement{}
 	bts, err := v.MarshalMsg(nil)
 	if err != nil {
 		t.Fatal(err)
@@ -32,8 +32,8 @@ func TestMarshalUnmarshalIVTMessage(t *testing.T) {
 	}
 }
 
-func BenchmarkMarshalMsgIVTMessage(b *testing.B) {
-	v := IVTMessage{}
+func BenchmarkMarshalMsgIvtBufferedMeasurement(b *testing.B) {
+	v := IvtBufferedMeasurement{}
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -41,8 +41,8 @@ func BenchmarkMarshalMsgIVTMessage(b *testing.B) {
 	}
 }
 
-func BenchmarkAppendMsgIVTMessage(b *testing.B) {
-	v := IVTMessage{}
+func BenchmarkAppendMsgIvtBufferedMeasurement(b *testing.B) {
+	v := IvtBufferedMeasurement{}
 	bts := make([]byte, 0, v.Msgsize())
 	bts, _ = v.MarshalMsg(bts[0:0])
 	b.SetBytes(int64(len(bts)))
@@ -53,8 +53,8 @@ func BenchmarkAppendMsgIVTMessage(b *testing.B) {
 	}
 }
 
-func BenchmarkUnmarshalIVTMessage(b *testing.B) {
-	v := IVTMessage{}
+func BenchmarkUnmarshalIvtBufferedMeasurement(b *testing.B) {
+	v := IvtBufferedMeasurement{}
 	bts, _ := v.MarshalMsg(nil)
 	b.ReportAllocs()
 	b.SetBytes(int64(len(bts)))
@@ -67,17 +67,17 @@ func BenchmarkUnmarshalIVTMessage(b *testing.B) {
 	}
 }
 
-func TestEncodeDecodeIVTMessage(t *testing.T) {
-	v := IVTMessage{}
+func TestEncodeDecodeIvtBufferedMeasurement(t *testing.T) {
+	v := IvtBufferedMeasurement{}
 	var buf bytes.Buffer
 	msgp.Encode(&buf, &v)
 
 	m := v.Msgsize()
 	if buf.Len() > m {
-		t.Log("WARNING: TestEncodeDecodeIVTMessage Msgsize() is inaccurate")
+		t.Log("WARNING: TestEncodeDecodeIvtBufferedMeasurement Msgsize() is inaccurate")
 	}
 
-	vn := IVTMessage{}
+	vn := IvtBufferedMeasurement{}
 	err := msgp.Decode(&buf, &vn)
 	if err != nil {
 		t.Error(err)
@@ -91,8 +91,8 @@ func TestEncodeDecodeIVTMessage(t *testing.T) {
 	}
 }
 
-func BenchmarkEncodeIVTMessage(b *testing.B) {
-	v := IVTMessage{}
+func BenchmarkEncodeIvtBufferedMeasurement(b *testing.B) {
+	v := IvtBufferedMeasurement{}
 	var buf bytes.Buffer
 	msgp.Encode(&buf, &v)
 	b.SetBytes(int64(buf.Len()))
@@ -105,8 +105,8 @@ func BenchmarkEncodeIVTMessage(b *testing.B) {
 	en.Flush()
 }
 
-func BenchmarkDecodeIVTMessage(b *testing.B) {
-	v := IVTMessage{}
+func BenchmarkDecodeIvtBufferedMeasurement(b *testing.B) {
+	v := IvtBufferedMeasurement{}
 	var buf bytes.Buffer
 	msgp.Encode(&buf, &v)
 	b.SetBytes(int64(buf.Len()))
