@@ -23,6 +23,6 @@ type IvtBufferedMeasurement struct {
 	IVTSupplyVoltage [BufferedMeasurementSizeAux]float32 `json:"ui" msg:"ui"`       // IVT Supply voltage in V
 	PGood5V          [BufferedMeasurementSizeAux]bool    `json:"pg5" msg:"pg5"`     // Power Good 5V
 	PGood3V3         [BufferedMeasurementSizeAux]bool    `json:"pg3v3" msg:"pg3v3"` // Power Good 3v3
-	SegmentStart     Timespec                            `json:"s" msg:"s"`         // SegmentStart is the time the first message of this segment was recorded
-	SegmentEnd       Timespec                            `json:"e" msg:"e"`         // SegmentEnd is the timestamp the last message of this sement was recorded
+	SegmentStart     Timespec64                          `json:"s" msg:"s"`         // SegmentStart is the time the first message of this segment was recorded
+	SegmentEnd       Timespec64                          `json:"e" msg:"e"`         // SegmentEnd is the timestamp the last message of this sement was recorded
 }
