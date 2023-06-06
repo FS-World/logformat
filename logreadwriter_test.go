@@ -23,17 +23,17 @@ func TestCANLogWriterReader(t *testing.T) {
 	var expected []CANFrame
 	for i := 0; i < testSize; i++ {
 		m := CANFrame{
-			TimestampSoftware: Timespec{0, 0},
-			TimestampHardware: Timespec{0, 0},
+			TimestampSoftware: Timespec64{0, 0},
+			TimestampHardware: Timespec64{0, 0},
 			ID:                0,
 			DLC:               8,
 			Data:              []byte{0, 1, 2, 3, 4, 5, 6, 7},
 		}
 		// fill data with semi-random values
 		m.ID = uint32(i)
-		m.TimestampHardware.Sec = int32(i)
-		m.TimestampSoftware.Sec = rand.Int31()
-		m.TimestampSoftware.Nsec = rand.Int31()
+		m.TimestampHardware.Sec = uint64(i)
+		m.TimestampSoftware.Sec = uint64(rand.Int63())
+		m.TimestampSoftware.Nsec = uint64(rand.Int63())
 		rand.Read(m.Data)
 
 		// save expected value

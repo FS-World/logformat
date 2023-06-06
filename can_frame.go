@@ -10,6 +10,7 @@ import (
 // check interface compatibility
 var (
 	_ Serializable = (*Timespec)(nil)
+	_ Serializable = (*Timespec64)(nil)
 	_ Serializable = (*CANFrame)(nil)
 )
 
@@ -23,10 +24,17 @@ type Timespec struct {
 	Nsec int32 `json:"ns" msg:"ns"` // Nanoseconds
 }
 
+// Timespec64 is the unix.Timespec struct for newer 64-bit platforms with msgp tags
+type Timespec64 struct {
+	Sec  uint64 `json:"s" msg:"s"`   // Seconds
+	Nsec uint64 `json:"ns" msg:"ns"` // Nanoseconds
+
+}
+
 // CANFrame is a CAN frame
 type CANFrame struct {
-	TimestampSoftware Timespec `json:"tss" msg:"tss"` // Software (kernel) timestamp of the frame
-	TimestampHardware Timespec `json:"tsh" msg:"tsh"` // Hardware timestamp of the frame
+	TimestampSoftware Timespec64 `json:"tss" msg:"tss"` // Software (kernel) timestamp of the frame
+	TimestampHardware Timespec64 `json:"tsh" msg:"tsh"` // Hardware timestamp of the frame
 	ID                uint32   `json:"id" msg:"id"`   // CAN ID
 	DLC               uint8    `json:"l" msg:"l"`     // CAN DLC (data length code)
 	Data              []byte   `json:"d" msg:"d"`     // CAN Data (0-8 bytes)
