@@ -22,7 +22,7 @@ func TestCANLogWriterReader(t *testing.T) {
 	}
 	var expected []CANFrame
 	for i := 0; i < testSize; i++ {
-		m := CANFrame{
+		m := CANFrame64{
 			TimestampSoftware: Timespec64{0, 0},
 			TimestampHardware: Timespec64{0, 0},
 			ID:                0,
@@ -37,10 +37,10 @@ func TestCANLogWriterReader(t *testing.T) {
 		rand.Read(m.Data)
 
 		// save expected value
-		expected = append(expected, m)
+		expected = append(expected, *m.ToOld())
 
 		// write to log
-		err = w.Write(&m)
+		err = w.Write(m.ToOld())
 		if err != nil {
 			t.Fatal(err)
 		}
