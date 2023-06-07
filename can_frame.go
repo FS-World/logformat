@@ -12,6 +12,7 @@ var (
 	_ Serializable = (*Timespec)(nil)
 	_ Serializable = (*Timespec64)(nil)
 	_ Serializable = (*CANFrame)(nil)
+	_ Serializable = (*CANFrame64)(nil)
 )
 
 const (
@@ -33,6 +34,13 @@ type Timespec64 struct {
 
 // CANFrame is a CAN frame
 type CANFrame struct {
+	TimestampSoftware Timespec `json:"tss" msg:"tss"` // Software (kernel) timestamp of the frame
+	TimestampHardware Timespec `json:"tsh" msg:"tsh"` // Hardware timestamp of the frame
+	ID                uint32   `json:"id" msg:"id"`   // CAN ID
+	DLC               uint8    `json:"l" msg:"l"`     // CAN DLC (data length code)
+	Data              []byte   `json:"d" msg:"d"`     // CAN Data (0-8 bytes)
+}// CANFrame64 is a CAN frame wikth 64-bit timestamps
+type CANFrame64 struct {
 	TimestampSoftware Timespec64 `json:"tss" msg:"tss"` // Software (kernel) timestamp of the frame
 	TimestampHardware Timespec64 `json:"tsh" msg:"tsh"` // Hardware timestamp of the frame
 	ID                uint32   `json:"id" msg:"id"`   // CAN ID
@@ -42,6 +50,16 @@ type CANFrame struct {
 
 // String formats a CAN message in human-readable format
 func (f *CANFrame) String() string {
+	var dataString string
+	for i := 0; i < int(f.DLC); i++ {
+		dataString += fmt.Sprintf("%02X ", f.Data[i])
+	}
+	return fmt.Sprintf("%d.%d: %08X [%d] %s", f.TimestampHardware.Sec, f.TimestampHardware.Nsec, f.ID, f.DLC, dataString)
+}
+
+
+// String formats a CAN message in human-readable format
+func (f *CANFrame64) String() string {
 	var dataString string
 	for i := 0; i < int(f.DLC); i++ {
 		dataString += fmt.Sprintf("%02X ", f.Data[i])

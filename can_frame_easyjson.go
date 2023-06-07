@@ -163,7 +163,7 @@ func (v *Timespec) UnmarshalJSON(data []byte) error {
 func (v *Timespec) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjson2e372ef2DecodeGithubComFsWorldLogformat1(l, v)
 }
-func easyjson2e372ef2DecodeGithubComFsWorldLogformat2(in *jlexer.Lexer, out *CANFrame) {
+func easyjson2e372ef2DecodeGithubComFsWorldLogformat2(in *jlexer.Lexer, out *CANFrame64) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -207,7 +207,106 @@ func easyjson2e372ef2DecodeGithubComFsWorldLogformat2(in *jlexer.Lexer, out *CAN
 		in.Consumed()
 	}
 }
-func easyjson2e372ef2EncodeGithubComFsWorldLogformat2(out *jwriter.Writer, in CANFrame) {
+func easyjson2e372ef2EncodeGithubComFsWorldLogformat2(out *jwriter.Writer, in CANFrame64) {
+	out.RawByte('{')
+	first := true
+	_ = first
+	{
+		const prefix string = ",\"tss\":"
+		out.RawString(prefix[1:])
+		(in.TimestampSoftware).MarshalEasyJSON(out)
+	}
+	{
+		const prefix string = ",\"tsh\":"
+		out.RawString(prefix)
+		(in.TimestampHardware).MarshalEasyJSON(out)
+	}
+	{
+		const prefix string = ",\"id\":"
+		out.RawString(prefix)
+		out.Uint32(uint32(in.ID))
+	}
+	{
+		const prefix string = ",\"l\":"
+		out.RawString(prefix)
+		out.Uint8(uint8(in.DLC))
+	}
+	{
+		const prefix string = ",\"d\":"
+		out.RawString(prefix)
+		out.Base64Bytes(in.Data)
+	}
+	out.RawByte('}')
+}
+
+// MarshalJSON supports json.Marshaler interface
+func (v CANFrame64) MarshalJSON() ([]byte, error) {
+	w := jwriter.Writer{}
+	easyjson2e372ef2EncodeGithubComFsWorldLogformat2(&w, v)
+	return w.Buffer.BuildBytes(), w.Error
+}
+
+// MarshalEasyJSON supports easyjson.Marshaler interface
+func (v CANFrame64) MarshalEasyJSON(w *jwriter.Writer) {
+	easyjson2e372ef2EncodeGithubComFsWorldLogformat2(w, v)
+}
+
+// UnmarshalJSON supports json.Unmarshaler interface
+func (v *CANFrame64) UnmarshalJSON(data []byte) error {
+	r := jlexer.Lexer{Data: data}
+	easyjson2e372ef2DecodeGithubComFsWorldLogformat2(&r, v)
+	return r.Error()
+}
+
+// UnmarshalEasyJSON supports easyjson.Unmarshaler interface
+func (v *CANFrame64) UnmarshalEasyJSON(l *jlexer.Lexer) {
+	easyjson2e372ef2DecodeGithubComFsWorldLogformat2(l, v)
+}
+func easyjson2e372ef2DecodeGithubComFsWorldLogformat3(in *jlexer.Lexer, out *CANFrame) {
+	isTopLevel := in.IsStart()
+	if in.IsNull() {
+		if isTopLevel {
+			in.Consumed()
+		}
+		in.Skip()
+		return
+	}
+	in.Delim('{')
+	for !in.IsDelim('}') {
+		key := in.UnsafeFieldName(false)
+		in.WantColon()
+		if in.IsNull() {
+			in.Skip()
+			in.WantComma()
+			continue
+		}
+		switch key {
+		case "tss":
+			(out.TimestampSoftware).UnmarshalEasyJSON(in)
+		case "tsh":
+			(out.TimestampHardware).UnmarshalEasyJSON(in)
+		case "id":
+			out.ID = uint32(in.Uint32())
+		case "l":
+			out.DLC = uint8(in.Uint8())
+		case "d":
+			if in.IsNull() {
+				in.Skip()
+				out.Data = nil
+			} else {
+				out.Data = in.Bytes()
+			}
+		default:
+			in.SkipRecursive()
+		}
+		in.WantComma()
+	}
+	in.Delim('}')
+	if isTopLevel {
+		in.Consumed()
+	}
+}
+func easyjson2e372ef2EncodeGithubComFsWorldLogformat3(out *jwriter.Writer, in CANFrame) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -242,23 +341,23 @@ func easyjson2e372ef2EncodeGithubComFsWorldLogformat2(out *jwriter.Writer, in CA
 // MarshalJSON supports json.Marshaler interface
 func (v CANFrame) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson2e372ef2EncodeGithubComFsWorldLogformat2(&w, v)
+	easyjson2e372ef2EncodeGithubComFsWorldLogformat3(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v CANFrame) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson2e372ef2EncodeGithubComFsWorldLogformat2(w, v)
+	easyjson2e372ef2EncodeGithubComFsWorldLogformat3(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *CANFrame) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson2e372ef2DecodeGithubComFsWorldLogformat2(&r, v)
+	easyjson2e372ef2DecodeGithubComFsWorldLogformat3(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *CANFrame) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson2e372ef2DecodeGithubComFsWorldLogformat2(l, v)
+	easyjson2e372ef2DecodeGithubComFsWorldLogformat3(l, v)
 }
