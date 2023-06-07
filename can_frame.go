@@ -48,6 +48,16 @@ type CANFrame64 struct {
 	Data              []byte   `json:"d" msg:"d"`     // CAN Data (0-8 bytes)
 }
 
+func(f *CANFrame64) ToOld() *CANFrame {
+	return &CANFrame{
+		TimestampSoftware: Timespec{Sec: int32(f.TimestampSoftware.Sec), Nsec: int32(f.TimestampSoftware.Nsec)},
+		TimestampHardware: Timespec{Sec: int32(f.TimestampHardware.Sec), Nsec: int32(f.TimestampHardware.Nsec)},
+		ID: f.ID,
+		DLC: f.DLC,
+		Data: f.Data,
+	}
+}
+
 // String formats a CAN message in human-readable format
 func (f *CANFrame) String() string {
 	var dataString string
